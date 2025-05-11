@@ -5,6 +5,8 @@
 # The script also checks for the presence of attributes before attempting to retrieve them.
 # This structure ensures compatibility with both RouterOS 6 and 7 while minimizing errors.
 # Errors are logged with line numbers to simplify debugging.
+# one liner to run the script "/tool fetch url="https://raw.githubusercontent.com/geekonamotorcycle/sysadmins-grimoires/refs/heads/main/scripts/firewall/routeros/list-ehernet-ports-v7.rsc" mode=https dst-path=list-ethernet-ports-v7.rsc && /import list-ethernet-ports-v7.rsc"
+
 
 :put "=== Ethernet Port Summary ==="
 

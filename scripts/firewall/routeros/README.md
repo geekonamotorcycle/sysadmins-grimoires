@@ -1,12 +1,15 @@
-# list-ethernet-ports-v7.rsc
+# Router OS 7 Scripts
 
-## 📄 Description
+## Scripts
+
+## List Interface
 
 `list-ethernet-ports-v7.rsc` is a MikroTik RouterOS script designed to provide a comprehensive summary of all Ethernet
 interfaces on devices running RouterOS 7+. The script retrieves essential details for each Ethernet port, including MAC
-address, running status, speed, MTU, RX/TX bytes, and bridge membership.
+address, running status, speed, MTU, RX/TX bytes, and bridge membership. This should help me, a newbie, get oriented in
+a new routerOS install.
 
-### 🔧 Features
+### List Interface - Features
 
 - Displays the following attributes for each Ethernet port:
   - Port name
@@ -26,20 +29,20 @@ address, running status, speed, MTU, RX/TX bytes, and bridge membership.
 
 ---
 
-## Installation
+### List Interface - Installation
 
-### Step 1: Upload the Script
+#### List Interface - Upload the Script
 
 1. Open your MikroTik device via serial console (e.g., using MobaXterm).
-2. Use `xmodem` to transfer the file:  
-  
+2. Use `xmodem` to transfer the file:
+
    ```bash
    /import xmodem
-   ```  
+   ```
 
-3. Start the xmodem transfer from your terminal client.  
+3. Start the xmodem transfer from your terminal client.
 
-### Step 2: Remove Previous Versions (if any)
+#### List Interface - Remove Previous Versions (if any)
 
 To remove an old version of the script:
 
@@ -47,7 +50,7 @@ To remove an old version of the script:
 /system script remove [find name=list-ethernet-ports-v7]
 ```
 
-### Step 3: Add the Script
+#### List Interface - Add the Script
 
 After uploading the file, add it to RouterOS:
 
@@ -60,7 +63,7 @@ Copy and paste the script content using the built-in editor.
 
 ---
 
-## Usage
+### List Interface - Usage
 
 Run the script using:
 
@@ -68,7 +71,9 @@ Run the script using:
 /system script run list-ethernet-ports-v7
 ```
 
-### Example Output  
+or use the (oneliner below)[]
+
+#### List Interface - Example Output
 
 ```text
 === Ethernet Port Summary ===
@@ -83,11 +88,19 @@ Port: ether1 | MAC: F4:1E:57:87:E5:1F | Running: true
 
 ---
 
+## Script one liners
+
+### list-ethernet-ports-v7.rsc
+
+```bash
+/tool fetch url="https://raw.githubusercontent.com/geekonamotorcycle/sysadmins-grimoires/refs/heads/main/scripts/firewall/routeros/list-ehernet-ports-v7.rsc" mode=https dst-path=list-ethernet-ports-v7.rsc && /import list-ethernet-ports-v7.rsc
+```
+
 ## Notes
 
 - The script has been tested on RouterOS 7+ and should work on any MikroTik device running this version.
 - The script is designed to handle variations between RouterOS 6 and 7. It will print `N/A` if an attribute is not
-available on the current RouterOS version.
+  available on the current RouterOS version.
 - Uses robust error handling to ensure the script continues to run even if an attribute retrieval fails.
 
 ---
