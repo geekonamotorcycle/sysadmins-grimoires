@@ -1,6 +1,13 @@
+# This script generates a summary of all ethernet ports on a MikroTik device.
+# It includes details such as port name, MAC address, running status, speed, MTU, L2 MTU, link-down count, bridge association, and comments.
+# The script dynamically detects the RouterOS version (6 or 7) and adjusts its behavior accordingly.
+# SafeGet is a robust function that attempts to retrieve an attribute and handles errors by returning "ER" for failure or "N/A" for a missing value.
+# The script also checks for the presence of attributes before attempting to retrieve them.
+# This structure ensures compatibility with both RouterOS 6 and 7 while minimizing errors.
+# Errors are logged with line numbers to simplify debugging.
+
 :put "=== Ethernet Port Summary ==="
 
-# Detect RouterOS version
 :local rosVersion [/system resource get version];
 :local isROS7 false;
 :if ([:find $rosVersion "7."] != 0) do={
@@ -43,12 +50,10 @@
     :local linkStatus "N/A";
     :local type "N/A";
 
-    # Check for link-downs only if the attribute exists
     :if ([$hasAttribute $port "link-downs"]) do={
         :set linkStatus [$safeGet $port "link-downs" "25"];
     }
 
-    # Only try to get type if not ROS 7
     :if (!$isROS7) do={
         :if ([$hasAttribute $port "type"]) do={
             :set type [$safeGet $port "type" "31"];
