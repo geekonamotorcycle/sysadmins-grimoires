@@ -1,12 +1,12 @@
 :put "=== Ethernet Port Summary ==="
 
 :global safeGet do={
-    :local cmd $1;
-    :local step $2;
-    :local attribute $3;
+    :local iface $1;
+    :local attribute $2;
+    :local step $3;
     :local result "";
     :do {
-        :set result [:execute $cmd];
+        :set result [/interface ethernet get $iface $attribute];
         :if ([:typeof $result] = "nil" || $result = "") do={
             :return "N/A";
         }
@@ -17,30 +17,52 @@
     }
 }
 
+:global hasAttribute do={
+    :local iface $1;
+    :local attribute $2;
+    :if ([:len [/interface ethernet print where name=$iface]] > 0) do={
+        :if ([:len [/interface ethernet get $iface $attribute]] > 0) do={
+            :return true;
+        }
+    }
+    :return false;
+}
+
 :foreach port in=[/interface ethernet find] do={
     :local portName [/interface ethernet get $port name];
 
-    :local macAddress [$safeGet ("/interface ethernet get " . $portName . " mac-address") "27" "mac-address"];
-    :local status [$safeGet ("/interface ethernet get " . $portName . " running") "28" "running"];
-    :local comment [$safeGet ("/interface ethernet get " . $portName . " comment") "29" "comment"];
-    :local linkStatus [$safeGet ("/interface ethernet get " . $portName . " link-downs") "30" "link-downs"];
-    :local rxBytes [$safeGet ("/interface ethernet get " . $portName . " rx-byte") "31" "rx-byte"];
-    :local txBytes [$safeGet ("/interface ethernet get " . $portName . " tx-byte") "32" "tx-byte"];
-    :local speed [$safeGet ("/interface ethernet get " . $portName . " speed") "33" "speed"];
-    :local mtu [$safeGet ("/interface ethernet get " . $portName . " mtu") "34" "mtu"];
-    :local l2mtu [$safeGet ("/interface ethernet get " . $portName . " l2mtu") "35" "l2mtu"];
-    :local type [$safeGet ("/interface ethernet get " . $portName . " type") "36" "type"];
+    :local macAddress [$safeGet $port "mac-address" "22"];
+    :local status [$safeGet $port "running" "23"];
+    :local comment [$safeGet $port "comment" "24"];
+    :local linkStatus "N/A";
+    :local type "N/A";
+    
+    # Check if link-downs is available for this interface
+    :if ([$hasAttribute $port "link-downs"]) do={
+        :set linkStatus [$safeGet $port "link-downs" "25"];
+    }
+
+    # Check if type is available for this interface
+    :if ([$hasAttribute $port "type"]) do={
+        :set type [$safeGet $port "type" "31"];
+    }
+
+    :local rxBytes [$safeGet $port "rx-byte" "26"];
+    :local txBytes [$safeGet $port "tx-byte" "27"];
+    :local speed [$safeGet $port "speed" "28"];
+    :local mtu [$safeGet $port "mtu" "29"];
+    :local l2mtu [$safeGet $port "l2mtu" "30"];
 
     :if ($type = "N/A") do={
-        :set type [$safeGet ("/interface get " . $portName . " type") "39" "interface-type"];
+        :set type [$safeGet $port "type" "34"];
     }
     :if ($speed = "N/A") do={
-        :set speed [$safeGet ("/interface get " . $portName . " speed") "42" "interface-speed"];
+        :set speed [$safeGet $port "speed" "37"];
     }
 
     :local bridgeName "None";
     :foreach bridge in=[/interface bridge port find where interface=$portName] do={
-        :set bridgeName [$safeGet ("/interface bridge port get " . $bridge . " bridge") "47" "bridge"];
+        :set bridgeName [$safeGet $bridge "bridge" "42"];
     }
 
     :put "-------------------------------";
