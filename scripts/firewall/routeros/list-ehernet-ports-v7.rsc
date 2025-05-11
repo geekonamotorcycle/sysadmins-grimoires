@@ -1,5 +1,12 @@
 :put "=== Ethernet Port Summary ==="
 
+# Detect RouterOS version
+:local rosVersion [/system resource get version];
+:local isROS7 false;
+:if ([:find $rosVersion "7."] != 0) do={
+    :set isROS7 true;
+}
+
 :global safeGet do={
     :local iface $1;
     :local attribute $2;
@@ -30,21 +37,22 @@
 
 :foreach port in=[/interface ethernet find] do={
     :local portName [/interface ethernet get $port name];
-
     :local macAddress [$safeGet $port "mac-address" "22"];
     :local status [$safeGet $port "running" "23"];
     :local comment [$safeGet $port "comment" "24"];
     :local linkStatus "N/A";
     :local type "N/A";
-    
-    # Check if link-downs is available for this interface
+
+    # Check for link-downs only if the attribute exists
     :if ([$hasAttribute $port "link-downs"]) do={
         :set linkStatus [$safeGet $port "link-downs" "25"];
     }
 
-    # Check if type is available for this interface
-    :if ([$hasAttribute $port "type"]) do={
-        :set type [$safeGet $port "type" "31"];
+    # Only try to get type if not ROS 7
+    :if (!$isROS7) do={
+        :if ([$hasAttribute $port "type"]) do={
+            :set type [$safeGet $port "type" "31"];
+        }
     }
 
     :local rxBytes [$safeGet $port "rx-byte" "26"];
@@ -52,13 +60,6 @@
     :local speed [$safeGet $port "speed" "28"];
     :local mtu [$safeGet $port "mtu" "29"];
     :local l2mtu [$safeGet $port "l2mtu" "30"];
-
-    :if ($type = "N/A") do={
-        :set type [$safeGet $port "type" "34"];
-    }
-    :if ($speed = "N/A") do={
-        :set speed [$safeGet $port "speed" "37"];
-    }
 
     :local bridgeName "None";
     :foreach bridge in=[/interface bridge port find where interface=$portName] do={
